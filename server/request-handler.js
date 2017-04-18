@@ -11,6 +11,9 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var fs = require('fs');
+var path = require('path');
+
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -27,7 +30,43 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
+
+//----------------Pseudocode
+//request - POST
+    //Define file structure to store the data
+    // Store the data as string - inside as an array
+    // FS.write to the file 
+//response - POST
+    // send status codes, headers, success message
+
+  var content = '';
+
+
+/*
+  if(request.method === 'OPTIONS'){
+    request.method === 'POST'
+  }
+
+  fs.appendFile(__dirname+'/classes/messages/messageData.txt', 'Hello Node12.js', (err) => {
+    if(err) throw err;
+    console.log("success")
+  })
+  
+  fs.open(__dirname+'/classes/messages/messageData.txt', 'w', function(err, data){
+    if(err){
+      return console.error(err);
+    }
+    console.log('data received: '+data.toString() );
+  })*/
+  
+ 
+
+ 
+console.log('dirname ', __dirname);
+console.log('pathname ',path.dirname(__filename));
+
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
+  // console.log('request data', request)
 
   // The outgoing status.
   var statusCode = 200;
@@ -40,10 +79,47 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = 'text/plain';
+  if(request.url !== '/classes/messages'){
+    response.writeHead(404, headers);
+    response.end();
+  }else if (request.method === 'OPTIONS') {
+    response.writeHead(200, headers);
+    response.end();
+  }else if(request.method === 'POST'){
+    //var body =[];
+    var res = {results:[]};
+    request.on('error', function(err){
+      console.error(err);
+    }).on('data', function(chunk){
+      console.log('chunk',chunk.toString());
+      res.results.push(chunk.toString());
+      console.log('get res', res);
+    });
 
+    // .on('end', function(){
+    //   // body = Buffer.concat(body).toString();
+    // });
+    
+    var statusCode = 201;
+    response.writeHead(statusCode, headers);
+    response.write(JSON.stringify(res))
+    response.end();
+
+  }else if(request.method === 'GET'){
+    var statusCode = 200;
+    var res = {results:[{
+      username: 'Jono',
+      message: 'Do my bidding!'
+    }]};
+    response.writeHead(statusCode, headers);
+    response.write(JSON.stringify(res));
+    response.end();
+  }
+  
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+  // response.writeHead(statusCode, headers);
+  // response.write(JSON.stringify(res));
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -52,7 +128,8 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end('Hello, World!');
+  // response.end('Hello, World!');
+
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -71,4 +148,4 @@ var defaultCorsHeaders = {
   'access-control-max-age': 10 // Seconds.
 };
 
-module.exports.requestHandler = requestHandler;
+module.exports = requestHandler;

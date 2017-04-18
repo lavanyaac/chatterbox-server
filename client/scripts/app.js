@@ -29,13 +29,13 @@ $(document).ready(function (){
 });
 
 var app = {
-  server: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
+  server: 'http://127.0.0.1:3000/classes/messages',
   rooms: {},
   lastMesgID: 0,
   init: function(){
     app.fetch();    
 
-    setInterval(function (){app.fetch()},3000);
+    setInterval(function (){app.fetch()},30000);
   },
   send: function(message){
     $.ajax({
@@ -62,7 +62,8 @@ var app = {
       url: app.server,
       type: 'GET',
       // data: {where:JSON.stringify({roomname: roomName}),limit: 1000, order: '-createdAt'},
-      data: {limit: 1000, order: '-createdAt'},
+      //data: {limit: 1000, order: '-createdAt'},
+      data: {limit: 1000},
       contentType: 'application/json',
 
       success: function (data) {       
