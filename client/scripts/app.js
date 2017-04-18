@@ -35,7 +35,7 @@ var app = {
   init: function(){
     app.fetch();    
 
-    setInterval(function (){app.fetch()},30000);
+    setInterval(function (){app.fetch()},3000);
   },
   send: function(message){
     $.ajax({
@@ -63,7 +63,7 @@ var app = {
       type: 'GET',
       // data: {where:JSON.stringify({roomname: roomName}),limit: 1000, order: '-createdAt'},
       //data: {limit: 1000, order: '-createdAt'},
-      data: {limit: 1000},
+      //data: {limit: 1000},
       contentType: 'application/json',
 
       success: function (data) {       
