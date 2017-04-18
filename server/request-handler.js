@@ -31,39 +31,16 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
 
-//----------------Pseudocode
-//request - POST
-    //Define file structure to store the data
-    // Store the data as string - inside as an array
-    // FS.write to the file 
-//response - POST
-    // send status codes, headers, success message
+  //----------------Pseudocode
+  //request - POST
+  //Define file structure to store the data
+  // Store the data as string - inside as an array
+  // FS.write to the file 
+  //response - POST
+  // send status codes, headers, success message
 
   var content = '';
 
-
-/*
-  if(request.method === 'OPTIONS'){
-    request.method === 'POST'
-  }
-
-  fs.appendFile(__dirname+'/classes/messages/messageData.txt', 'Hello Node12.js', (err) => {
-    if(err) throw err;
-    console.log("success")
-  })
-  
-  fs.open(__dirname+'/classes/messages/messageData.txt', 'w', function(err, data){
-    if(err){
-      return console.error(err);
-    }
-    console.log('data received: '+data.toString() );
-  })*/
-  
- 
-
- 
-console.log('dirname ', __dirname);
-console.log('pathname ',path.dirname(__filename));
 
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
   // console.log('request data', request)
@@ -78,44 +55,36 @@ console.log('pathname ',path.dirname(__filename));
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
-  headers['Content-Type'] = 'text/plain';
-  if(request.url !== '/classes/messages'){
+  headers['Content-Type'] = 'application/json';
+  if (request.url !== '/classes/messages') {
     response.writeHead(404, headers);
     response.end();
-  }else if (request.method === 'OPTIONS') {
+  } else if (request.method === 'OPTIONS') {
     response.writeHead(200, headers);
     response.end();
-  }else if(request.method === 'POST'){
-    //var body =[];
-    var res = {results:[]};
-    request.on('error', function(err){
-      console.error(err);
-    }).on('data', function(chunk){
-      console.log('chunk',chunk.toString());
+  } else if (request.method === 'POST') {
+    var res = { results: [] };
+
+    request.on('data', function(chunk) {
       res.results.push(chunk.toString());
-      console.log('get res', res);
     });
 
-    // .on('end', function(){
-    //   // body = Buffer.concat(body).toString();
-    // });
-    
     var statusCode = 201;
     response.writeHead(statusCode, headers);
-    response.write(JSON.stringify(res))
-    response.end();
+    response.end(JSON.stringify(res));
 
-  }else if(request.method === 'GET'){
+  } else if (request.method === 'GET') {
     var statusCode = 200;
-    var res = {results:[{
-      username: 'Jono',
-      message: 'Do my bidding!'
-    }]};
+    var res = {
+      results: [{
+        username: 'Jono',
+        message: 'Do my bidding!'
+      }]
+    };
     response.writeHead(statusCode, headers);
-    response.write(JSON.stringify(res));
-    response.end();
+    response.end(JSON.stringify(res));
   }
-  
+
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   // response.writeHead(statusCode, headers);
@@ -144,8 +113,8 @@ console.log('pathname ',path.dirname(__filename));
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': 'content-type, accept',
+  'access-control-allow-headers': '*',
   'access-control-max-age': 10 // Seconds.
 };
 
-module.exports = requestHandler;
+module.exports.requestHandler = requestHandler;
