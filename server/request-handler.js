@@ -97,6 +97,9 @@ var requestHandler = function(request, response) {
     var res = {results: []};
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(res));
+  } else {
+    response.end('Hello, World!');
+    
   }
 
   // .writeHead() writes to the request line and headers of the response,
@@ -111,7 +114,6 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  // response.end('Hello, World!');
 
 };
 
