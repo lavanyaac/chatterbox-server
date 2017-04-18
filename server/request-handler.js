@@ -14,6 +14,13 @@ this file and include it in basic-server.js so that it actually works.
 var fs = require('fs');
 var path = require('path');
 
+var defaultCorsHeaders = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'access-control-allow-headers': '*',
+  'access-control-max-age': 10 // Seconds.
+};
+
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -30,17 +37,6 @@ var requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-
-  //----------------Pseudocode
-  //request - POST
-  //Define file structure to store the data
-  // Store the data as string - inside as an array
-  // FS.write to the file 
-  //response - POST
-  // send status codes, headers, success message
-
-  var content = '';
-
 
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
   // console.log('request data', request)
@@ -59,12 +55,13 @@ var requestHandler = function(request, response) {
   if (request.url !== '/classes/messages') {
     response.writeHead(404, headers);
     response.end();
+
   } else if (request.method === 'OPTIONS') {
     response.writeHead(200, headers);
     response.end();
+
   } else if (request.method === 'POST') {
     var res = { results: [] };
-
     request.on('data', function(chunk) {
       res.results.push(chunk.toString());
     });
@@ -81,6 +78,23 @@ var requestHandler = function(request, response) {
         message: 'Do my bidding!'
       }]
     };
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify(res));
+
+  } else if (request.method === 'PUT') {
+    var statusCode = 201;
+    var res = {
+      results: [{
+        username: 'Jono',
+        message: 'Do my bidding minions!'
+      }]
+    };
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify(res));
+
+  } else if (request.method === 'DELETE') {
+    var statusCode = 202;
+    var res = {results: []};
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(res));
   }
@@ -110,11 +124,6 @@ var requestHandler = function(request, response) {
 //
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
-var defaultCorsHeaders = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'access-control-allow-headers': '*',
-  'access-control-max-age': 10 // Seconds.
-};
+
 
 module.exports.requestHandler = requestHandler;

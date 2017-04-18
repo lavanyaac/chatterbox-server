@@ -116,4 +116,54 @@ describe('Node Server Request Listener Function', function() {
       });
   });
 
+  it('Should respond with messages that were overwritten posted', function() {
+    var stubMsg = {
+      username: 'Jono',
+      message: 'Do my bidding!'
+    };
+    var req = new stubs.request('/classes/messages', 'PUT', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+
+      // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length).to.be.above(0);
+    expect(messages[0].username).to.equal('Jono');
+    expect(messages[0].message).to.equal('Do my bidding!');
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should respond with messages that were deleted', function() {
+    var stubMsg = {
+      username: 'Jono',
+      message: 'Do my bidding!'
+    };
+    var req = new stubs.request('/classes/messages', 'DELETE', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(202);
+
+      // Now if we request the log for that room the message we posted should be there:
+    // req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(202);
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length).to.be.equal(0);
+    expect(res._ended).to.equal(true);
+  });
+
 });
