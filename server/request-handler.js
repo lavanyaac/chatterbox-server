@@ -14,6 +14,44 @@ this file and include it in basic-server.js so that it actually works.
 var fs = require('fs');
 var path = require('path');
 
+var writeFile = function(message) {
+  console.log('MESSAGE HERE--------', message);
+  fs.readFile('messageData.json', 'utf-8', function(err, data) {
+    if (err) {
+      return console.error(err); 
+    }
+    var dataObj = JSON.parse(data);
+
+    dataObj.push(message)
+    console.log('DATA IS PUSHED', dataObj)
+    fs.writeFile('messageData.json', JSON.stringify(dataObj))
+  //   console.log('file is open success!!!!!!!!!', openFile)
+  });
+}
+
+var readFile = function() {
+  // fs.open('messageData.json', 'a', function(err, fd) {
+  //   if (err) {
+  //     return console.error(err); 
+  //   }
+    var res;
+    fs.readFile('./messageData.json', function(err, data) {
+      if (err) {
+        return console.error(err);
+      }
+      res = JSON.parse(data);
+      console.log('THIS IS PARSED DATA', res);
+    })
+    return res;
+    // fs.close(fd, function(err) {
+    //   if (err) {
+    //     return console.error(err);
+    //   }
+    // })
+    // console.log('file is open success!!!!!!!!!', openFile)
+  // });
+  
+} 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -69,6 +107,7 @@ var requestHandler = function(request, response) {
       var chunkParsed = JSON.parse(chunk.toString());
       chunkParsed.objectID = ++objectIdCounter;
       data.results.push(chunkParsed);
+      writeFile(JSON.stringify(chunkParsed));
     });
 
     var statusCode = 201;
@@ -77,6 +116,8 @@ var requestHandler = function(request, response) {
 
   } else if (request.method === 'GET') {
     var statusCode = 200;
+    var data = readFile();
+    console.log('DATA---------------', data)
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(data));
 
