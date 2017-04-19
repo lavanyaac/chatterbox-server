@@ -18,8 +18,12 @@ var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'access-control-allow-headers': '*',
-  'access-control-max-age': 10 // Seconds.
+  'access-control-max-age': 10, // Seconds.
+  'Content-Type': 'application/json'
 };
+
+var objectIdCounter = 1;
+var data = {results: []}
 
 
 var requestHandler = function(request, response) {
@@ -39,7 +43,6 @@ var requestHandler = function(request, response) {
   // console.logs in your code.
 
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
-  // console.log('request data', request)
 
   // The outgoing status.
   var statusCode = 200;
@@ -52,6 +55,7 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = 'application/json';
+
   if (request.url !== '/classes/messages') {
     response.writeHead(404, headers);
     response.end();
@@ -61,25 +65,20 @@ var requestHandler = function(request, response) {
     response.end();
 
   } else if (request.method === 'POST') {
-    var res = { results: [] };
     request.on('data', function(chunk) {
-      res.results.push(chunk.toString());
+      var chunkParsed = JSON.parse(chunk.toString());
+      chunkParsed.objectID = ++objectIdCounter;
+      data.results.push(chunkParsed);
     });
 
     var statusCode = 201;
-    response.writeHead(statusCode, headers);
-    response.end(JSON.stringify(res));
+    response.writeHead(statusCode, JSON.stringify(data), headers);
+    response.end(JSON.stringify(data));
 
   } else if (request.method === 'GET') {
     var statusCode = 200;
-    var res = {
-      results: [{
-        username: 'Jono',
-        message: 'Do my bidding!'
-      }]
-    };
     response.writeHead(statusCode, headers);
-    response.end(JSON.stringify(res));
+    response.end(JSON.stringify(data));
 
   } else if (request.method === 'PUT') {
     var statusCode = 201;
@@ -98,8 +97,8 @@ var requestHandler = function(request, response) {
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(res));
   } else {
-    response.end('Hello, World!');
-    
+    response.writeHead(statusCode, headers);
+    response.end(statusCode, headers);
   }
 
   // .writeHead() writes to the request line and headers of the response,

@@ -70,10 +70,12 @@ var app = {
         var results = data.results;
 
         var mostRecentMesgID = results[results.length-1].objectID;
-        if(mostRecentMesgID !== app.lastMesgID){
-          app.renderRoomList(results); 
-          that.lastMesgID = mostRecentMesgID; 
-        }
+        // if(mostRecentMesgID !== app.lastMesgID){
+        //   app.renderRoomList(results); 
+        //   that.lastMesgID = mostRecentMesgID; 
+        // }
+        console.log(roomName)
+        app.renderRoomList(results); 
 
         if(roomName){
           results = _.filter(results,function(obj){return obj.roomname === roomName});
